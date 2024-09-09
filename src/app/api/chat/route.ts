@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
-      max_tokens: 300,
+      max_tokens: 3000,
       top_p: 1,  
       frequency_penalty: 0.5,
       presence_penalty: 0,
