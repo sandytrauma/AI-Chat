@@ -10,6 +10,8 @@ import { FaCircleNotch } from "react-icons/fa";
 
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
 
+const generateUniqueId = () => `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
 const ChatContainer: React.FC = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const [messages, setMessages] = useState<{ id: string; isAi: boolean; content: string }[]>([]);
@@ -17,8 +19,6 @@ const ChatContainer: React.FC = () => {
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const messagesRef = ref(db, 'messages');
-
-  const generateUniqueId = () => `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
   const fetchMessages = async () => {
     const messagesQuery = query(messagesRef, orderByChild('id'), limitToLast(100));
@@ -63,94 +63,92 @@ const ChatContainer: React.FC = () => {
     return () => {
       clearInterval(intervalId); // Clean up interval on component unmount
     };
-  }, [fetchMessages]);
+  }, []);
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  if (!isLoaded) return <div className="flex items-center justify-center h-screen w-screen">
-    <FaCircleNotch className="animate-spin text-gray-600" size={50} />
-  </div>
+  if (!isLoaded) return (
+    <div className="flex items-center justify-center h-screen w-screen">
+      <FaCircleNotch className="animate-spin text-gray-600" size={50} />
+    </div>
+  );
 
   return (
     <div className="flex h-screen">
- 
-  <div className="w-1/4 bg-gray-200 p-4 border-r border-gray-300">
-    <h1 className="text-lg font-bold mb-4">Welcome to AI Chat, your personal assistant</h1>
-    <div className="text-center">
-      <UserButton />
-    </div>
-    {isSignedIn ? (
-      <div className="flex items-center space-x-2 mt-4">
-        <Image
-          height={40}
-          width={40}
-          src={user.profileImage || defaultProfile} // Use defaultProfile if user.profileImage is not available
-          alt="User"
-          className="w-10 h-10 rounded-full"
-        />
-        <div>
-          <p className="text-sm font-medium">{user.fullName || 'User'}</p>
-          <p className="text-xs text-gray-600">
-            {user.emailAddresses[0]?.emailAddress || 'No email'}
-          </p>
+      <div className="w-1/4 bg-gray-200 p-4 border-r border-gray-300">
+        <h1 className="text-lg font-bold mb-4">Welcome to AI Chat, your personal assistant</h1>
+        <div className="text-center">
+          <UserButton />
         </div>
-      </div>
-    ) : (
-      <p className="text-sm text-gray-600 mt-4">You need to sign in to see your details.</p>
-    )}
-  </div>
-
-
-  <div className="flex-1 flex flex-col p-4 bg-gray-100">
-    <div className="flex-1 flex flex-col overflow-hidden">
-     
-      <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-md p-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'} space-x-2 mb-2`}
-          >
+        {isSignedIn ? (
+          <div className="flex items-center space-x-2 mt-4">
             <Image
-              height={28}
-              width={28}
-              priority
-              src={msg.isAi ? bot : userImage}
-              alt={msg.isAi ? 'Bot' : 'User'}
-              className="w-8 h-8 rounded-full"
+              height={40}
+              width={40}
+              src={defaultProfile} // Ensure profileImage exists or use defaultProfile
+              alt="User"
+              className="w-10 h-10 rounded-full"
             />
-            <div
-              className={`p-3 rounded-lg max-w-xs ${msg.isAi ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'
-                }`}
-            >
-              {msg.content}
+            <div>
+              <p className="text-sm font-medium">{user.fullName || 'User'}</p>
+              <p className="text-xs text-gray-600">
+                {user.emailAddresses[0]?.emailAddress || 'No email'}
+              </p>
             </div>
           </div>
-        ))}
-        <div ref={endOfMessagesRef} />
+        ) : (
+          <p className="text-sm text-gray-600 mt-4">You need to sign in to see your details.</p>
+        )}
       </div>
 
-      
-      <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-4">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
-          className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-200"
-        >
-          Send
-        </button>
-      </form>
+      <div className="flex-1 flex flex-col p-4 bg-gray-100">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-md p-4">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'} space-x-2 mb-2`}
+              >
+                <Image
+                  height={28}
+                  width={28}
+                  priority
+                  src={msg.isAi ? bot : userImage}
+                  alt={msg.isAi ? 'Bot' : 'User'}
+                  className="w-8 h-8 rounded-full"
+                />
+                <div
+                  className={`p-3 rounded-lg max-w-xs ${msg.isAi ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'
+                    }`}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            <div ref={endOfMessagesRef} />
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-4">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-200"
+            >
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   );
 };
 
