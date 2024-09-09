@@ -63,7 +63,7 @@ const ChatContainer: React.FC = () => {
     return () => {
       clearInterval(intervalId); // Clean up interval on component unmount
     };
-  }, []);
+  }, [fetchMessages]);
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
