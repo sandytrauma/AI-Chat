@@ -7,6 +7,30 @@ import defaultProfile from '/public/assets/default-profile.svg';
 import Image from 'next/image';
 import { db, ref, set, query, orderByChild, limitToLast, get } from '../services/firebaseConfig';
 import { FaCircleNotch } from "react-icons/fa";
+import Link from "next/link"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+
+import {
+
+  Home,
+  LineChart,
+  Menu,
+  Package,
+  Package2,
+
+  ShoppingCart,
+  Users,
+} from "lucide-react"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
 
@@ -77,31 +101,149 @@ const ChatContainer: React.FC = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/4 bg-gray-200 p-4 border-r border-gray-300">
-        <h1 className="text-lg font-bold mb-4">Welcome to AI Chat, your personal assistant</h1>
-        <div className="text-center">
-          <UserButton />
-        </div>
-        {isSignedIn ? (
-          <div className="flex items-center space-x-2 mt-4">
-            <Image
-              height={40}
-              width={40}
-              src={defaultProfile} // Ensure profileImage exists or use defaultProfile
-              alt="User"
-              className="w-10 h-10 rounded-full"
-            />
-            <div>
-              <p className="text-sm font-medium">{user.fullName || 'User'}</p>
-              <p className="text-xs text-gray-600">
-                {user.emailAddresses[0]?.emailAddress || 'No email'}
-              </p>
+      <div className="hidden border-r bg-muted/40 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+
+            <div className="text-center">
+              <UserButton />
             </div>
+            {isSignedIn ? (
+              <div className="flex items-center space-x-2 mt-4">
+                <Image
+                  height={40}
+                  width={40}
+                  src={defaultProfile}
+                  alt="User"
+                  className="w-10 h-10 rounded-full"
+                />
+                <div>
+                  <p className="text-sm font-medium">{user.fullName || 'User'}</p>
+                  <p className="text-xs text-gray-600">
+                    {user.emailAddresses[0]?.emailAddress || 'No email'}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 mt-4">You need to sign in to see your details.</p>
+            )}
           </div>
-        ) : (
-          <p className="text-sm text-gray-600 mt-4">You need to sign in to see your details.</p>
-        )}
+          <div>
+            <div className="flex-1">
+              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                >
+                  <Home className="h-4 w-4" />
+                  Dashboard
+                </Link>
+
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                >
+                  <LineChart className="h-4 w-4" />
+                  Usage
+                </Link>
+              </nav>              
+            </div>            
+          </div>
+          <div className="mt-auto p-4">
+                <Card x-chunk="dashboard-02-chunk-0">
+                  <CardHeader className="p-2 pt-0 md:p-4">
+                    <CardTitle>Upgrade to Pro</CardTitle>
+                    <CardDescription>
+                      Unlock all features and get unlimited access to our support
+                      team.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
+                    <Button size="sm" className="w-full">
+                      Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+        </div>
       </div>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 md:hidden"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle navigation menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="flex flex-col">
+          <nav className="grid gap-2 text-lg font-medium">
+            <Link
+              href="#"
+              className="flex items-center gap-2 text-lg font-semibold"
+            >
+              <Package2 className="h-6 w-6" />
+              <span className="sr-only">Acme Inc</span>
+            </Link>
+            <Link
+              href="#"
+              className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+            >
+              <Home className="h-5 w-5" />
+              Dashboard
+            </Link>
+            <Link
+              href="#"
+              className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              Orders
+              <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                6
+              </Badge>
+            </Link>
+            <Link
+              href="#"
+              className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+            >
+              <Package className="h-5 w-5" />
+              Products
+            </Link>
+            <Link
+              href="#"
+              className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+            >
+              <Users className="h-5 w-5" />
+              Customers
+            </Link>
+            <Link
+              href="#"
+              className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+            >
+              <LineChart className="h-5 w-5" />
+              Analytics
+            </Link>
+          </nav>
+          <div className="mt-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle>Upgrade to Pro</CardTitle>
+                <CardDescription>
+                  Unlock all features and get unlimited access to our
+                  support team.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button size="sm" className="w-full">
+                  Upgrade
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <div className="flex-1 flex flex-col p-4 bg-gray-100">
         <div className="flex-1 flex flex-col overflow-hidden">
