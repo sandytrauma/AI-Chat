@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { UserButton, useUser } from '@clerk/nextjs';
 import bot from '/public/assets/bot.svg';
 import userImage from '/public/assets/user.svg';
@@ -7,29 +7,11 @@ import defaultProfile from '/public/assets/default-profile.svg';
 import Image from 'next/image';
 import { db, ref, set, query, orderByChild, limitToLast, get } from '../services/firebaseConfig';
 import { FaCircleNotch } from "react-icons/fa";
-import Link from "next/link"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-
-import { Button } from "@/components/ui/button"
-
-import {
-
-  Home,
-  LineChart,
-  Menu,
-
-  Package2,
-
-
-} from "lucide-react"
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import Link from "next/link";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Home, LineChart, Menu, Package2 } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
 
@@ -43,13 +25,14 @@ const ChatContainer: React.FC = () => {
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const messagesRef = ref(db, 'messages');
 
-  const fetchMessages = async () => {
+  // Memoize fetchMessages to avoid unnecessary re-renders
+  const fetchMessages = useCallback(async () => {
     const messagesQuery = query(messagesRef, orderByChild('id'), limitToLast(100));
     const snapshot = await get(messagesQuery);
     const messagesData: { [key: string]: { id: string; isAi: boolean; content: string } } = snapshot.val();
     const loadedMessages = Object.values(messagesData || {});
     setMessages(loadedMessages);
-  };
+  }, [messagesRef]); // Ensure messagesRef is stable or include other dependencies if needed
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +69,7 @@ const ChatContainer: React.FC = () => {
     return () => {
       clearInterval(intervalId); // Clean up interval on component unmount
     };
-  }, [fetchMessages]);
+  }, [fetchMessages]); // Include fetchMessages in the dependency array
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -103,7 +86,6 @@ const ChatContainer: React.FC = () => {
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-
             <div className="text-center">
               <UserButton />
             </div>
@@ -137,7 +119,6 @@ const ChatContainer: React.FC = () => {
                   <Home className="h-4 w-4" />
                   Dashboard
                 </Link>
-
                 <Link
                   href="#"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
@@ -145,25 +126,24 @@ const ChatContainer: React.FC = () => {
                   <LineChart className="h-4 w-4" />
                   Usage
                 </Link>
-              </nav>              
-            </div>            
+              </nav>
+            </div>
           </div>
           <div className="mt-auto p-4">
-                <Card x-chunk="dashboard-02-chunk-0">
-                  <CardHeader className="p-2 pt-0 md:p-4">
-                    <CardTitle>Upgrade to Pro</CardTitle>
-                    <CardDescription>
-                      Unlock all features and get unlimited access to our support
-                      team.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                    <Button size="sm" className="w-full">
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
+            <Card x-chunk="dashboard-02-chunk-0">
+              <CardHeader className="p-2 pt-0 md:p-4">
+                <CardTitle>Upgrade to Pro</CardTitle>
+                <CardDescription>
+                  Unlock all features and get unlimited access to our support team.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
+                <Button size="sm" className="w-full">
+                  Upgrade
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
       <Sheet>
@@ -193,7 +173,6 @@ const ChatContainer: React.FC = () => {
               <Home className="h-5 w-5" />
               Dashboard
             </Link>
-            
             <Link
               href="#"
               className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
@@ -207,8 +186,7 @@ const ChatContainer: React.FC = () => {
               <CardHeader>
                 <CardTitle>Upgrade to Pro</CardTitle>
                 <CardDescription>
-                  Unlock all features and get unlimited access to our
-                  support team.
+                  Unlock all features and get unlimited access to our support team.
                 </CardDescription>
               </CardHeader>
               <CardContent>
