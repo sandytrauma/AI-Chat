@@ -5,7 +5,11 @@ import { SignUp } from '@clerk/nextjs';
 const SignUpPage = () => {
   return (
     
-      <SignUp />
+    <div className="flex items-center justify-center w-full h-screen">
+      <SignUp
+      afterSignInUrl="/dashboard"
+      />
+    </div>
    
   );
 

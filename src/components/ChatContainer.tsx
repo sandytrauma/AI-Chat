@@ -84,8 +84,9 @@ const ChatContainer: React.FC = () => {
       const container = containerRef.current;
       if (!container) return;
 
-      const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+      const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 1;
       setIsUserScrolling(!isAtBottom);
+      setShouldScroll(isAtBottom);
     };
 
     const container = containerRef.current;
@@ -101,6 +102,7 @@ const ChatContainer: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Determine if auto-scrolling should be enabled
     if (messages.length > 0) {
       setShouldScroll(true);
     }
@@ -142,10 +144,15 @@ const ChatContainer: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex justify-end w-full">
+              <div className="flex justify-end w-full gap-2">
                 <Link href="/sign-in">
-                  <Button variant="secondary" className="text-sm text-gray-100 mt-4">
+                  <Button variant="secondary" className="text-sm text-teal-900 mt-4">
                     Sign-in
+                  </Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button variant="secondary" className="text-sm text-teal-900 mt-4">
+                    Sign-up
                   </Button>
                 </Link>
               </div>
@@ -309,7 +316,7 @@ const ChatContainer: React.FC = () => {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Try this... [You are a Maths teacher and you will teach me probability!]"
+              placeholder="Type your message..."
               className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />

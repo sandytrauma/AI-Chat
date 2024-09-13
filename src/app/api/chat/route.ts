@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-
 // Initialize OpenAI with API Key
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -21,10 +20,17 @@ export async function POST(request: Request) {
       presence_penalty: 0,
     });
 
+    console.log('OpenAI response:', response);
 
-    return NextResponse.json({ bot: response.choices[0].message.content }, {status: 200});
+    // Check response structure
+    if (response.choices && response.choices.length > 0) {
+      return NextResponse.json({ bot: response.choices[0].message.content }, { status: 200 });
+    } else {
+      return NextResponse.json({ error: 'No choices returned' }, { status: 500 });
+    }
+
   } catch (error) {
-    console.error(error);
+    console.error('Error in OpenAI request:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
