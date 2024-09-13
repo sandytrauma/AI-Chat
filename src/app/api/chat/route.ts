@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       presence_penalty: 0,
     });
 
-    console.log('OpenAI response:', response);
+   
 
     // Check response structure
     if (response.choices && response.choices.length > 0) {
