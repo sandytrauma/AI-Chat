@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+
 // Initialize OpenAI with API Key
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
     const { prompt } = await request.json();
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-0125',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
       max_tokens: 3000,
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
       presence_penalty: 0,
     });
 
-    return NextResponse.json({ bot: response.choices[0].message.content });
+
+    return NextResponse.json({ bot: response.choices[0].message.content }, {status: 200});
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
