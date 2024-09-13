@@ -22,7 +22,6 @@ const ChatContainer: React.FC = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const [messages, setMessages] = useState<{ id: string; isAi: boolean; content: string }[]>([]);
   const [input, setInput] = useState('');
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(true);
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
@@ -74,37 +73,15 @@ const ChatContainer: React.FC = () => {
   }, [fetchMessages]);
 
   useEffect(() => {
-    if (shouldScroll && !isUserScrolling) {
+    if (shouldScroll) {
       endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [shouldScroll, isUserScrolling, messages]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 1;
-      setIsUserScrolling(!isAtBottom);
-      setShouldScroll(isAtBottom);
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, []);
+  }, [shouldScroll, messages]);
 
   useEffect(() => {
     // Determine if auto-scrolling should be enabled
     if (messages.length > 0) {
-      setShouldScroll(true);
+      setShouldScroll(false);
     }
   }, [messages]);
 
@@ -115,10 +92,10 @@ const ChatContainer: React.FC = () => {
   );
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col lg:flex-row lg:divide-x h-screen">
       {/* Sidebar */}
-      <div className="hidden border-r bg-muted/40 md:block bg-teal-800">
-        <div className="flex h-full max-h-screen flex-col gap-2">
+      <div className="hidden lg:block lg:w-78 md:w-78 border-r bg-muted/40 bg-teal-600">
+        <div className="flex h-full flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/">
               <Image
@@ -159,25 +136,23 @@ const ChatContainer: React.FC = () => {
             )}
           </div>
 
-          <div>
-            <div className="flex-1">
-              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-100 transition-all hover:text-teal-200"
-                >
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </Link>
-                <Link
-                  href="#"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-100 transition-all hover:text-teal-200"
-                >
-                  <LineChart className="h-4 w-4" />
-                  Usage
-                </Link>
-              </nav>
-            </div>
+          <div className="flex-1 overflow-auto">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-100 transition-all hover:text-teal-200"
+              >
+                <Home className="h-4 w-4" />
+                Dashboard
+              </Link>
+              <Link
+                href="#"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-100 transition-all hover:text-teal-200"
+              >
+                <LineChart className="h-4 w-4" />
+                Usage
+              </Link>
+            </nav>
           </div>
           <div className="mt-auto p-4">
             <Card x-chunk="dashboard-02-chunk-0">
@@ -203,12 +178,12 @@ const ChatContainer: React.FC = () => {
           <Button
             variant="outline"
             size="icon"
-            className="shrink-0 md:hidden"
+            className="shrink-0 fixed lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col">
+        <SheetContent side="left" className="flex flex-col w-64">
           <nav className="grid gap-2 text-lg font-medium">
             <Link
               href="/"
@@ -280,13 +255,13 @@ const ChatContainer: React.FC = () => {
       </Sheet>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col p-4 bg-gray-100">
-        <div className="hidden md:block lg:block text-center p-2 mb-2 ring-1 rounded-md bg-gradient-to-r from-purple-500 to-red-400 font-mono">
+      <div className="flex-1 flex flex-col mt-4 lg:flex-1 lg:pl-4 lg:pr-4 lg:overflow-hidden">
+        <div className="hidden lg:block text-center p-2 mb-2 ring-1 rounded-md bg-gradient-to-r from-purple-500 to-red-400 font-mono">
           <p className="text-xl text-slate-100">AI Powered Chat for you, where you can experience the power of generative AI technology.<br />
             Ask anything and get answers to complex questions...!! Try Now...</p>
         </div>
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div ref={containerRef} className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-md p-4">
+        <div className="flex-1 flex flex-col bg-gray-100 overflow-hidden">
+          <div ref={containerRef} className="flex-1 overflow-scroll bg-white border border-gray-200 rounded-lg shadow-md p-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -301,10 +276,10 @@ const ChatContainer: React.FC = () => {
                   className="w-8 h-8 rounded-full"
                 />
                 <div
-                  className={`p-3 rounded-lg max-w-auto ${msg.isAi ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'
+                  className={`p-3 rounded-lg max-w-xs ${msg.isAi ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'
                     }`}
                 >
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  <ReactMarkdown className={`${msg.isAi ? 'overflow-x-scroll' : ''}`}>{msg.content}</ReactMarkdown>
                 </div>
               </div>
             ))}
