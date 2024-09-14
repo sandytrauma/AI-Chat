@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, set, query, orderByChild, limitToLast, get } from 'firebase/database';
+import { getDatabase, ref, set, query, orderByChild, limitToLast, get, update } from 'firebase/database';
 
 // Firebase configuration object
 const firebaseConfig = {
@@ -17,4 +17,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-export { db, ref, set, query, orderByChild, limitToLast, get };
+export { db, ref, set, query, orderByChild, limitToLast, get,  update  };

@@ -1,10 +1,12 @@
+import Footer from '@/components/Footer';
 import './globals.css'; // Import global styles
 import { ClerkProvider } from '@clerk/nextjs';
+import Navbar from '@/components/Navbar';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <html lang="en" className="h-full">
+      <html lang="en" className="h-full w-full">
         <head>          
           <title>AI-Chat4u</title>
           <meta charSet="UTF-8"/>
@@ -16,12 +18,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta property="og:url" content="https://master--ai-chat4u.netlify.app/" /> {/* Optional */}
           <meta name="robots" content="index,follow" />
           <link rel="icon" href="/favicon.ico" />
-          {/* Add any additional external scripts or styles here */}
         </head>
-        <body className="h-full">
-          <div className="h-full">
+        <body className="h-full w-full bg-cover bg-gradient-to-tr from-lime-400 to-neutral-300 flex flex-col">
+          <Navbar />
+          <main className="flex-grow p-4">
             {children}
-          </div>
+          </main>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>

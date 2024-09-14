@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import bot from '/public/assets/bot.svg';
 import userImage from '/public/assets/user.svg';
 import Image from 'next/image';
-import { db, ref, set, query, orderByChild, limitToLast, get } from '../services/firebaseConfig';
+import { db, ref, set, query, orderByChild, limitToLast, get, update } from '../services/firebaseConfig';
 import { FaCircleNotch } from "react-icons/fa";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { cn } from '@/lib/utils';
 
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
+const PROMPT_LIMIT = 10; // Limit to 10 prompts
 
 const generateUniqueId = () => `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
@@ -23,9 +24,11 @@ const ChatContainer: React.FC = () => {
   const [messages, setMessages] = useState<{ id: string; isAi: boolean; content: string }[]>([]);
   const [input, setInput] = useState('');
   const [shouldScroll, setShouldScroll] = useState(true);
+  const [promptCount, setPromptCount] = useState(0);
 
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const messagesRef = ref(db, 'messages');
+  const userRef = ref(db, `users/${user?.id}`);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = useCallback(async () => {
@@ -36,8 +39,22 @@ const ChatContainer: React.FC = () => {
     setMessages(loadedMessages);
   }, [messagesRef]);
 
+  const fetchPromptCount = useCallback(async () => {
+    if (user) {
+      const snapshot = await get(userRef);
+      const userData = snapshot.val();
+      setPromptCount(userData?.promptCount || 0);
+    }
+  }, [user, userRef]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (promptCount >= PROMPT_LIMIT) {
+      alert('You have reached the limit of 10 prompts. Please upgrade to Pro.');
+      window.location.href = '/upgrade'; // Redirect to upgrade page
+      return;
+    }
 
     const newMessageId = generateUniqueId();
     const newMessage = { id: newMessageId, isAi: false, content: input };
@@ -56,6 +73,11 @@ const ChatContainer: React.FC = () => {
 
       const aiMessage = { id: generateUniqueId(), isAi: true, content: data.bot };
       await set(ref(db, `messages/${aiMessage.id}`), aiMessage);
+
+      // Update prompt count
+      const newPromptCount = promptCount + 1;
+      setPromptCount(newPromptCount);
+      await update(userRef, { promptCount: newPromptCount });
     } catch (error) {
       console.error('Error:', error);
       const errorMessage = { id: generateUniqueId(), isAi: true, content: 'Something went wrong. Please try again.' };
@@ -65,12 +87,13 @@ const ChatContainer: React.FC = () => {
 
   useEffect(() => {
     fetchMessages();
+    fetchPromptCount();
 
     const intervalId = setInterval(fetchMessages, POLL_INTERVAL);
     return () => {
       clearInterval(intervalId);
     };
-  }, [fetchMessages]);
+  }, [fetchMessages, fetchPromptCount]);
 
   useEffect(() => {
     if (shouldScroll) {
@@ -92,22 +115,14 @@ const ChatContainer: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row lg:divide-x h-screen">
+    <div className="flex flex-col lg:flex-row lg:divide-x h-screen overflow-y-scroll mb-24 m-5">
       {/* Sidebar */}
-      <div className="hidden lg:block lg:w-78 md:w-78 border-r bg-muted/40 bg-teal-600">
+      <div className="hidden lg:block lg:w-64 md:w-64 lg:rounded-l-md bg-teal-950">
         <div className="flex h-full flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/">
-              <Image
-                src="/Chat4U.png"
-                width={48}
-                height={48}
-                alt='logo'
-                className="mr-2 rounded-full"
-              />
-            </Link>
+            
             {isSignedIn ? (
-              <div className={cn("flex w-full items-center justify-end space-x-2 mt-4")}>
+              <div className={cn("flex w-full items-center space-x-2 mt-4")}>
                 <div className="flex items-center gap-2 text-slate-200">
                   <UserButton />
                   <div className="text-slate-200">
@@ -136,7 +151,7 @@ const ChatContainer: React.FC = () => {
             )}
           </div>
 
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
               <Link
                 href="/dashboard"
@@ -185,18 +200,7 @@ const ChatContainer: React.FC = () => {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col w-64">
           <nav className="grid gap-2 text-lg font-medium">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-lg font-semibold"
-            >
-              <Image
-                src="/Chat4U.png"
-                width={68}
-                height={68}
-                alt='logo'
-                className="mr-2 rounded-full"
-              />
-            </Link>
+            
             <Link
               href="/dashboard"
               className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
@@ -245,9 +249,11 @@ const ChatContainer: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <Link href="/upgrade">
                 <Button size="sm" className="w-full">
                   Upgrade
                 </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -255,12 +261,12 @@ const ChatContainer: React.FC = () => {
       </Sheet>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col mt-4 lg:flex-1 lg:pl-4 lg:pr-4 lg:overflow-hidden">
+      <div className="flex-1 flex flex-col mt-4 rounded-md lg:flex-1 lg:pl-4 lg:pr-4 lg:overflow-hidden lg:rounded-r-md bg-teal-950 lg:p-2">
         <div className="hidden lg:block text-center p-2 mb-2 ring-1 rounded-md bg-gradient-to-r from-purple-500 to-red-400 font-mono">
           <p className="text-xl text-slate-100">AI Powered Chat for you, where you can experience the power of generative AI technology.<br />
             Ask anything and get answers to complex questions...!! Try Now...</p>
         </div>
-        <div className="flex-1 flex flex-col bg-gray-100 overflow-hidden">
+        <div className="flex-1 flex flex-col bg-gray-100 md:rounded-md overflow-hidden">
           <div ref={containerRef} className="flex-1 overflow-scroll bg-white border border-gray-200 rounded-lg shadow-md p-4">
             {messages.map((msg) => (
               <div
@@ -286,7 +292,7 @@ const ChatContainer: React.FC = () => {
             <div ref={endOfMessagesRef} />
           </div>
 
-          <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-4">
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-4 p-4 bg-white border-t border-gray-200">
             <input
               type="text"
               value={input}

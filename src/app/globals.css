@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Add this CSS to your global styles or the component's CSS module */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+
 
 @layer base {
   :root {
@@ -67,7 +77,17 @@
   }
 }
 ::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: #29456d;
   
-  height: 2px;
-  background-color: #aaa; /* or add it to the track */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(rgb(134, 239, 172), rgb(59, 130, 246), rgb(147, 51, 234));
 }
