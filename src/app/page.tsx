@@ -62,6 +62,7 @@ const GPT3Search: React.FC = () => {
     }
 
     setLoading(true);
+    setInput("");
 
     try {
       const response = await fetch('/api/chat', {
