@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { UserButton, useUser } from '@clerk/nextjs';
-import ReactMarkdown from 'react-markdown';
-import bot from '/public/assets/bot.svg';
+
 import userImage from '/public/assets/user.svg';
 import Image from 'next/image';
 import { db, ref, set, query, orderByChild, limitToLast, get, update } from '../services/firebaseConfig';
@@ -13,15 +12,27 @@ import { Button } from "@/components/ui/button";
 import { Home, LineChart, Menu } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
+import rehypeFormat from 'rehype-format';
+import rehypeStringify from 'rehype-stringify';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import { unified } from 'unified';
+
 
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
 const PROMPT_LIMIT = 10; // Limit to 10 prompts
+
+const processor = unified()
+  .use(remarkParse)          // Parse Markdown into an abstract syntax tree (AST)
+  .use(remarkRehype)         // Transform Markdown AST to HTML AST
+  .use(rehypeFormat)         // Format HTML for better readability
+  .use(rehypeStringify);     // Convert HTML AST to HTML string
 
 const generateUniqueId = () => `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 const ChatContainer: React.FC = () => {
   const { user, isLoaded, isSignedIn } = useUser();
-  const [messages, setMessages] = useState<{ id: string; isAi: boolean; content: string }[]>([]);
+  const [messages, setMessages] = useState<{ id: string; isAi: boolean; content: string; htmlContent?: string }[]>([]);
   const [input, setInput] = useState('');
   const [shouldScroll, setShouldScroll] = useState(true);
   const [promptCount, setPromptCount] = useState(0);
@@ -36,7 +47,11 @@ const ChatContainer: React.FC = () => {
     const snapshot = await get(messagesQuery);
     const messagesData: { [key: string]: { id: string; isAi: boolean; content: string } } = snapshot.val();
     const loadedMessages = Object.values(messagesData || {});
-    setMessages(loadedMessages);
+    const messagesWithHtml = await Promise.all(loadedMessages.map(async (msg) => {
+      const htmlContent = await processMarkdown(msg.content);
+      return { ...msg, htmlContent };
+    }));
+    setMessages(messagesWithHtml);
   }, [messagesRef]);
 
   const fetchPromptCount = useCallback(async () => {
@@ -88,6 +103,7 @@ const ChatContainer: React.FC = () => {
   useEffect(() => {
     fetchMessages();
     fetchPromptCount();
+    setPromptCount(0);
 
     const intervalId = setInterval(fetchMessages, POLL_INTERVAL);
     return () => {
@@ -108,6 +124,11 @@ const ChatContainer: React.FC = () => {
     }
   }, [messages]);
 
+  const processMarkdown = async (markdownContent: string) => {
+    const file = await processor.process(markdownContent);
+    return String(file);
+  };
+
   if (!isLoaded) return (
     <div className="flex items-center justify-center h-screen w-screen">
       <FaCircleNotch className="animate-spin text-gray-600" size={50} />
@@ -120,7 +141,6 @@ const ChatContainer: React.FC = () => {
       <div className="hidden lg:block lg:w-64 md:w-64 lg:rounded-l-md bg-teal-950">
         <div className="flex h-full flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            
             {isSignedIn ? (
               <div className={cn("flex w-full items-center space-x-2 mt-4")}>
                 <div className="flex items-center gap-2 text-slate-200">
@@ -200,7 +220,6 @@ const ChatContainer: React.FC = () => {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col w-64">
           <nav className="grid gap-2 text-lg font-medium">
-            
             <Link
               href="/dashboard"
               className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
@@ -250,9 +269,9 @@ const ChatContainer: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <Link href="/upgrade">
-                <Button size="sm" className="w-full">
-                  Upgrade
-                </Button>
+                  <Button size="sm" className="w-full">
+                    Upgrade
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
@@ -266,27 +285,25 @@ const ChatContainer: React.FC = () => {
           <p className="text-xl text-slate-100">AI Powered Chat for you, where you can experience the power of generative AI technology.<br />
             Ask anything and get answers to complex questions...!! Try Now...</p>
         </div>
-        <div className="flex-1 flex flex-col bg-gray-100 md:rounded-md overflow-hidden">
-          <div ref={containerRef} className="flex-1 overflow-scroll bg-white border border-gray-200 rounded-lg shadow-md p-4">
+        <div className="flex-1 flex flex-col bg-zinc-900 bg-muted md:rounded-md overflow-hidden">
+          <div ref={containerRef} className="flex-1 overflow-x-scroll border border-gray-200 rounded-lg shadow-md p-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'} space-x-2 mb-2`}
               >
                 <Image
-                  height={28}
-                  width={28}
-                  priority
-                  src={msg.isAi ? bot : userImage}
+                  height={32}
+                  width={32}                  
+                  src={msg.isAi ? "/assets/bot.svg": userImage || "/assets/user.svg" }
                   alt={msg.isAi ? 'Bot' : 'User'}
-                  className="w-8 h-8 rounded-full"
+                  className="rounded-full top-0"
                 />
                 <div
-                  className={`p-3 rounded-lg max-w-xs ${msg.isAi ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'
+                  className={`p-3 rounded-lg max-w-xl overflow-y-scroll whitespace-pre-wrap ${msg.isAi ? 'bg-gray-200 text-lg prose text-gray-800 hover:bg-teal-300 hover:text-zinc-700 cursor-pointer'  : 'bg-blue-500 text-white'
                     }`}
-                >
-                  <ReactMarkdown className={`${msg.isAi ? 'overflow-x-scroll' : ''}`}>{msg.content}</ReactMarkdown>
-                </div>
+                  dangerouslySetInnerHTML={{ __html: msg.htmlContent || '' }}
+                />
               </div>
             ))}
             <div ref={endOfMessagesRef} />

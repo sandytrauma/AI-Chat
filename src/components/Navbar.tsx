@@ -2,10 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from './ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { UserButton, useUser } from '@clerk/nextjs';
-import { Home, LineChart, Menu } from 'lucide-react'
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+
 
 function Navbar() {
     return (
@@ -14,17 +11,18 @@ function Navbar() {
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                         <Image src="/Chat4U.png" width={48} height={48} className="" alt="Flowbite Logo" />
-                            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">AI Chat 4 U</span>
+                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">AI Chat 4 U</span>
                     </Link>
-                    <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                        <Button type="button" className="text-white hidden bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get started</Button>
-                        
-                    </div>                    
+
+                    <Link href="/dashboard" className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <Button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get started</Button>
+                    </Link>
+
                 </div>
             </nav>
-            
-          
-           
+
+
+
         </div>
     )
 }
