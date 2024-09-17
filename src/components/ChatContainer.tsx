@@ -136,85 +136,65 @@ const ChatContainer: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row lg:divide-x h-screen overflow-y-scroll mb-24 m-5">
-      {/* Sidebar */}
-      <div className="hidden lg:block lg:w-64 md:w-64 lg:rounded-l-md bg-teal-950">
-        <div className="flex h-full flex-col gap-2">
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            {isSignedIn ? (
-              <div className={cn("flex w-full items-center space-x-2 mt-4")}>
-                <div className="flex items-center gap-2 text-slate-200">
-                  <UserButton />
-                  <div className="text-slate-200">
-                    <p className="text-sm font-medium hover:text-teal-300">
-                      {user.fullName || 'User'}
-                    </p>
-                    <p className="text-xs text-slate-200">
-                      {user.emailAddresses[0]?.emailAddress || 'No email'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-end w-full gap-2">
-                <Link href="/sign-in">
-                  <Button variant="secondary" className="text-sm text-teal-900 mt-4">
-                    Sign-in
-                  </Button>
-                </Link>
-                <Link href="/sign-up">
-                  <Button variant="secondary" className="text-sm text-teal-900 mt-4">
-                    Sign-up
-                  </Button>
-                </Link>
-              </div>
-            )}
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden m-5">
+  {/* Sidebar */}
+  <div className="hidden lg:flex lg:w-64 flex-col bg-gradient-to-b from-slate-700 to-slate-400 shadow-lg md:rounded-l-md">
+    <div className="flex flex-col gap-4 p-4">
+      <div className="flex h-14 items-center border-b border-teal-400 px-4 lg:h-[60px] lg:px-6">
+        {isSignedIn ? (
+          <div className="flex w-full items-center space-x-2 mt-4 text-white">
+            <UserButton />
+            <div>
+              <p className="text-sm font-medium hover:text-purple-300">
+                {user.fullName || 'User'}
+              </p>
+              <p className="text-xs">
+                {user.emailAddresses[0]?.emailAddress || 'No email'}
+              </p>
+            </div>
           </div>
-
-          <div className="flex-1">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-100 transition-all hover:text-teal-200"
-              >
-                <Home className="h-4 w-4" />
-                Dashboard
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-100 transition-all hover:text-teal-200"
-              >
-                <LineChart className="h-4 w-4" />
-                Usage
-              </Link>
-            </nav>
+        ) : (
+          <div className="flex justify-end w-full gap-2">
+            <Link href="/sign-in">
+              <Button variant="secondary" className="text-sm text-purple-900 mt-4">
+                Sign-in
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button variant="secondary" className="text-sm text-purple-900 mt-4">
+                Sign-up
+              </Button>
+            </Link>
           </div>
-          <div className="mt-auto p-4">
-            <Card x-chunk="dashboard-02-chunk-0">
-              <CardHeader className="p-2 pt-0 md:p-4">
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>
-                  Unlock all features and get unlimited access to our support team.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                <Button size="sm" className="w-full">
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* Mobile Menu */}
-      <Sheet>
+      <nav className="flex-1 grid items-start px-2 text-sm font-medium lg:px-4">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-white transition-all hover:text-purple-200"
+        >
+          <Home className="h-4 w-4" />
+          Dashboard
+        </Link>
+        <Link
+          href="#"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-white transition-all hover:text-purple-200"
+        >
+          <LineChart className="h-4 w-4" />
+          Usage
+        </Link>
+      
+      </nav>      
+    </div>
+    
+  </div>
+  <Sheet>
         <SheetTrigger asChild>
           <Button
             variant="outline"
             size="icon"
-            className="shrink-0 fixed lg:hidden"
-          >
+            className="shrink-0 fixed lg:hidden"          >
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
@@ -279,55 +259,62 @@ const ChatContainer: React.FC = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col mt-4 rounded-md lg:flex-1 lg:pl-4 lg:pr-4 lg:overflow-hidden lg:rounded-r-md bg-teal-950 lg:p-2">
-        <div className="hidden lg:block text-center p-2 mb-2 ring-1 rounded-md bg-gradient-to-r from-purple-500 to-red-400 font-mono">
-          <p className="text-xl text-slate-100">AI Powered Chat for you, where you can experience the power of generative AI technology.<br />
-            Ask anything and get answers to complex questions...!! Try Now...</p>
-        </div>
-        <div className="flex-1 flex flex-col bg-zinc-900 bg-muted md:rounded-md overflow-hidden">
-          <div ref={containerRef} className="flex-1 overflow-x-scroll border border-gray-200 rounded-lg shadow-md p-4">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'} space-x-2 mb-2`}
-              >
-                <Image
-                  height={32}
-                  width={32}                  
-                  src={msg.isAi ? "/assets/bot.svg": userImage || "/assets/user.svg" }
-                  alt={msg.isAi ? 'Bot' : 'User'}
-                  className="rounded-full top-0"
-                />
-                <div
-                  className={`p-3 rounded-lg max-w-xl overflow-y-scroll whitespace-pre-wrap ${msg.isAi ? 'bg-gray-200 text-lg prose text-gray-800 hover:bg-teal-300 hover:text-zinc-700 cursor-pointer'  : 'bg-blue-500 text-white'
-                    }`}
-                  dangerouslySetInnerHTML={{ __html: msg.htmlContent || '' }}
-                />
-              </div>
-            ))}
-            <div ref={endOfMessagesRef} />
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-4 p-4 bg-white border-t border-gray-200">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-200"
-            >
-              Send
-            </button>
-          </form>
-        </div>
-      </div>
+  {/* Chat Area */}
+  <div className="flex-1 flex flex-col">
+    <div className="text-center p-4 ring-1 rounded-t-md md:rounded-tr-md bg-gradient-to-r from-emerald-400 to-amber-400 font-mono">
+      <p className="text-sm prose md:text-xl text-white ">
+        AI Powered Chat for you, where you can experience the power of generative AI technology.<br />
+        Ask anything and get answers to complex questions...!! Try Now...
+      </p>
     </div>
+    <div className="flex-1 flex flex-col bg-muted overflow-y-scroll">      
+      <div ref={containerRef} className="flex-1 overflow-y-scroll shadow-md p-4">      
+
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex ${msg.isAi ? 'justify-start' : 'justify-end'} space-x-2 mb-2`}
+          >
+            <Image
+              height={32}
+              width={32}                  
+              src={msg.isAi ? "/assets/bot.svg": userImage || "/assets/user.svg" }
+              alt={msg.isAi ? 'Bot' : 'User'}
+              className="rounded-full top-0"
+            />
+            <div
+              className={`p-2 rounded-lg max-w-xl overflow-y-scroll whitespace-pre-wrap ${msg.isAi ? 'bg-gray-200 text-md prose text-gray-800 hover:bg-teal-300 hover:text-zinc-700 cursor-pointer'  : 'bg-blue-500 text-white'
+                }`}
+              dangerouslySetInnerHTML={{ __html: msg.htmlContent || '' }}
+            />
+          </div>
+        ))}
+        <div ref={endOfMessagesRef} />
+      </div>
+      
+
+      <form onSubmit={handleSubmit} className="flex items-center rounded-br-md space-x-2 p-4 bg-white border-t border-gray-200">
+          
+      
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message..."
+          className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-200"
+        >
+          Send
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
   );
 };
 

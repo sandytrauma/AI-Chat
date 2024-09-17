@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { FaSquareGithub } from "react-icons/fa6";
 
 const Footer: React.FC = () => {
     return (
@@ -57,12 +58,13 @@ const Footer: React.FC = () => {
                 </div>
                 <div className="mt-6 border-t border-gray-700 pt-4 text-center">
                     <p className="text-sm">
-                        &copy; {new Date().getFullYear()} Site created by{' '}
-                        <a
-                            href="https://github.com/sandytrauma/sections-of-law"
-                            className="github-button"
+                        &copy; {new Date().getFullYear()} Site created by {'sandytrauma'}
+                        
+                        <a                        
+                            href="https://github.com/sandytrauma/AI-Chat/tree/master"
+                            className="github-button text-center justify-center"
                         >
-                            sandytrauma
+                            <FaSquareGithub className="text-2xl mx-auto"/>
                         </a>. All rights reserved.
                     </p>
                 </div>
