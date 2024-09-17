@@ -109,7 +109,7 @@ const GPT3Search: React.FC = () => {
 
   useEffect(() => {
     handleAuthentication();
-  }, [setAttempts]);
+  }, [handleAuthentication]);
 
   const processMarkdown = async (markdownContent: string) => {
     const file = await processor.process(markdownContent);
