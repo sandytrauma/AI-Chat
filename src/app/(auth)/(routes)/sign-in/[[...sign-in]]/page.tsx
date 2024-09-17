@@ -8,9 +8,6 @@ const SignInPage = () => {
       <SignIn
         afterSignInUrl="/dashboard"
       />
-      <Link href="/">
-       
-      </Link>
     </div>
     
   );
