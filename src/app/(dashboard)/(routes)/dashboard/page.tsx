@@ -1,5 +1,5 @@
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
-import ChatContainer from '@/components/ChatContainer'; // Adjust the import path as needed
+import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
+import ChatContainer from "@/components/ChatContainer"; // Adjust the import path as needed
 
 const ChatPage = () => {
   return (
