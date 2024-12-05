@@ -35,7 +35,7 @@ import { unified } from "unified";
 import ChatInput from "./ChatInput"; // Import ChatInput component
 
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
-const PROMPT_LIMIT = 10; // Limit to 10 prompts
+const PROMPT_LIMIT = 50; // Limit to 10 prompts
 
 const processor = unified()
   .use(remarkParse)
