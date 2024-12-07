@@ -120,7 +120,7 @@ const GPT3Search: React.FC = () => {
   <div className="relative w-full h-full rounded-2xl mx-h-[600px]">
     <div className="absolute inset-0 bg-zinc-500 opacity-50 rounded-2xl"></div>
     <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
-      <div className="text-center text-wrap p-4 md:p-6 mb-6 ring-1 rounded-lg bg-gradient-to-r from-lime-200 to-purple-200 font-mono shadow-lg animate-fade-in">
+      <div className="text-center mx-auto text-wrap p-4 md:p-6 mb-6 ring-1 rounded-lg bg-gradient-to-r from-lime-200 to-purple-200 font-mono shadow-lg animate-fade-in">
         <p className="text-2xl md:text-3xl text-slate-700 font-bold">
           AI Powered Chat
         </p>
@@ -151,7 +151,7 @@ const GPT3Search: React.FC = () => {
         </button>
       </form>
 
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-screen">
         {results.map((result, index) => (
           <div
             key={index}
