@@ -117,10 +117,7 @@ const GPT3Search: React.FC = () => {
 
   return (
     <div className="w-full h-screen relative mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  <div
-    className="absolute inset-0 bg-cover bg-center rounded-2xl mx-h-[600px]"
-    style={{ backgroundImage: "url(reshot-icon-namaste-FNKJ7G32XH.svg)" }}
-  >
+  <div className="relative w-full h-full rounded-2xl mx-h-[600px]">
     <div className="absolute inset-0 bg-zinc-500 opacity-50 rounded-2xl"></div>
     <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
       <div className="text-center text-wrap p-4 md:p-6 mb-6 ring-1 rounded-lg bg-gradient-to-r from-lime-200 to-purple-200 font-mono shadow-lg animate-fade-in">
@@ -189,6 +186,7 @@ const GPT3Search: React.FC = () => {
     </div>
   </div>
 </div>
+
 
 
   );
