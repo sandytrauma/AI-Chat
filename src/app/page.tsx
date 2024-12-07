@@ -116,11 +116,12 @@ const GPT3Search: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-screen relative mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  <div className="relative w-full h-full rounded-2xl mx-h-[600px]">
+    
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-lime-200 to-purple-200">
+  <div className="relative w-full max-w-4xl p-6 bg-white rounded-2xl shadow-xl overflow-hidden">
     <div className="absolute inset-0 bg-zinc-500 opacity-50 rounded-2xl"></div>
-    <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
-      <div className="text-center mx-auto text-wrap p-4 md:p-6 mb-6 ring-1 rounded-lg bg-gradient-to-r from-lime-200 to-purple-200 font-mono shadow-lg animate-fade-in">
+    <div className="relative z-10 flex flex-col items-center justify-center">
+      <div className="text-center mx-auto p-4 md:p-6 mb-6 ring-1 rounded-lg bg-gradient-to-r from-lime-200 to-purple-200 font-mono shadow-lg animate-fade-in">
         <p className="text-2xl md:text-3xl text-slate-700 font-bold">
           AI Powered Chat
         </p>
