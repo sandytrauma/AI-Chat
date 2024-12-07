@@ -156,7 +156,7 @@ const GPT3Search: React.FC = () => {
         {results.map((result, index) => (
           <div
             key={index}
-            className="p-4 mb-2 border prose text-slate-500 border-gray-300 text-wrap text-justify overflow-hidden rounded-lg bg-white shadow-md"
+            className="p-4 mb-2 mx-auto border prose text-slate-500 border-gray-300 text-wrap text-justify overflow-hidden rounded-lg bg-white shadow-md"
           >
             <div dangerouslySetInnerHTML={{ __html: result }} />
           </div>
